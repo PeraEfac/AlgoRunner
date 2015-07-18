@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Website</title>
+
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <script src="js/jquery.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+    </head>
+    <body bgcolor = #333>
+        <header class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Algorithm Runner</a>
+
+                </div>
+            </div>
+        </header>
+
+        <section class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+
+                    <div class="list-group">
+                        <button type="button" class="list-group-item"></button>
+
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Algorithm" id="patternUser">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" onclick="patternSelection()">Add</button>
+                        </span>
+                    </div><!-- /input-group -->
+
+
+                </div>
+
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+
+                    <div class="list-group">
+                        <button type="button" class="list-group-item">  </button>
+
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Algorithm" id="dataInput">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" onclick="processData()">Process Data</button>
+                        </span>
+                    </div><!-- /input-group -->
+
+
+
+                </div>
+
+            </div>
+
+            <div class="row">&nbsp;</div>
+            <div class="row">&nbsp;</div>
+
+            <div class="row">
+                <div class="col-lg-8 col-sm-8 col-xs-12">
+
+
+                    <script>
+                        var xmlhttprequest = new XMLHttpRequest();
+                        function getData()
+                        {
+
+
+                            xmlhttprequest.onreadystatechange = getServerResponse;
+
+                            // send a GET request to the server. Send the user input as a parameter in the url. You have to use open() and send() methods here to send a request.
+                            xmlhttprequest.open("GET", "getData", true);
+                            xmlhttprequest.send(null);
+
+                            return getServerResponse();
+                        }
+                        function getServerResponse()
+                        {
+                            //checking the 'readyState' and 'status' properties of the XMLHttpRequest object, set the 'suggestions' field to the response received by the server.
+
+
+                            if (xmlhttprequest.readyState === 4) {
+                                if (xmlhttprequest.status === 200) {
+                                    //   alert(xmlhttprequest.responseText);
+                                    g2 = new Dygraph(
+                                            document.getElementById("graphdiv2"),
+                                            xmlhttprequest.responseText
+                                            , // path to CSV file
+                                            {}          // options
+                                    );
+
+                                    return xmlhttprequest.responseText;
+                                }
+                            }
+
+
+                        }
+
+                        function processData() {
+                            var processReq = new XMLHttpRequest();
+                            var url = "getData";
+                            var params = "data="+document.getElementById("dataInput").value;
+                   //         alert(params);
+                            processReq.open("POST", url, true);
+
+//Send the proper header information along with the request
+                            processReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            processReq.setRequestHeader("Content-length", params.length);
+                            processReq.setRequestHeader("Connection", "close");
+
+                            processReq.onreadystatechange = function () {//Call a function when the state changes.
+                                if (processReq.readyState === 4 && processReq.status === 200) {
+                                    alert(processReq.responseText);
+                                    g2 = new Dygraph(
+                                            document.getElementById("graphdiv2"),
+                                            processReq.responseText
+                                            , // path to CSV file
+                                            {}          // options
+                                    );
+                                }
+                            };
+                            processReq.send(params);
+                        }
+
+
+
+                        function patternSelection() {
+                            var patternReq = new XMLHttpRequest();
+                            var url = "PatternReq";
+                            alert(document.getElementById("patternUser").value);
+                            var params = "pat="+document.getElementById("patternUser").value+"&data="+document.getElementById("dataInput").value+"";
+                   //         alert(params);
+                            patternReq.open("POST", url, true);
+
+//Send the proper header information along with the request
+                            patternReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            patternReq.setRequestHeader("Content-length", params.length);
+                            patternReq.setRequestHeader("Connection", "close");
+
+                            patternReq.onreadystatechange = function () {//Call a function when the state changes.
+                                if (patternReq.readyState === 4 && patternReq.status === 200) {
+                             //       alert(patternReq.responseText);
+                                    g2 = new Dygraph(
+                                            document.getElementById("graphdiv3"),
+                                            patternReq.responseText
+                                            , // path to CSV file
+                                            {}          // options
+                                    );
+                                }
+                            };
+                            patternReq.send(params);
+                            /////////////chech
+                            var patternReqC = new XMLHttpRequest();
+                            var url = "PatternCheckReq";
+                          //  alert(document.getElementById("patternUser").value);
+                            var params = "pat="+document.getElementById("patternUser").value+"&data="+document.getElementById("dataInput").value+"";
+                   //         alert(params);
+                            patternReqC.open("POST", url, true);
+
+//Send the proper header information along with the request
+                            patternReqC.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            patternReqC.setRequestHeader("Content-length", params.length);
+                            patternReqC.setRequestHeader("Connection", "close");
+
+                            patternReqC.onreadystatechange = function () {//Call a function when the state changes.
+                                if (patternReqC.readyState === 4 && patternReqC.status === 200) {
+                                    document.getElementById("checkboxes").innerHTML = patternReqC.responseText;
+                                }
+                            };
+                            patternReqC.send(params);
+                        }
+
+                    </script>
+
+                    <script type="text/javascript"
+                    src="dygraph-combined-dev.js"></script>
+
+
+                    <div id="graphdiv2"
+                         style="width:90%; height:300px;"></div>
+                    <script type="text/javascript">
+                      //  var data = getData();
+                        //  alert(getData()+" jj ");
+                          g2 = new Dygraph(
+                         document.getElementById("graphdiv2"),
+                         
+                         "Date,High,Low\n" +
+                         "2007-01-01,62,39\n" +
+                         "2007-01-02,62,44\n" +
+                         "2007-01-03,62,42\n" +
+                         "2007-01-04,57,45\n" +
+                         "2007-01-05,54,44\n" +
+                         "2007-01-06,55,36\n" +
+                         "2007-01-07,62,45\n" +
+                         "2007-01-08,66,48\n" +
+                         "2007-01-09,63,39\n" +
+                         "2007-01-10,57,37\n" +
+                         "2007-01-11,50,37\n" +
+                         "2007-01-12,48,35\n"
+                        
+                         , // path to CSV file
+                         {}          // options
+                         );
+                    </script>
+                    <hr/>
+                    <div id="graphdiv3"
+                         style="width:90%; height:300px;"> </div>
+                    <script type="text/javascript">
+                        g2 = new Dygraph(
+                                document.getElementById("graphdiv3"),
+                                "Date,High,Low\n" +
+                                "2007-01-01,62,39\n" +
+                                "2007-01-02,62,44\n" +
+                                "2007-01-03,62,42\n" +
+                                "2007-01-04,57,45\n" +
+                                "2007-01-05,54,44\n" +
+                                "2007-01-06,55,36\n" +
+                                "2007-01-07,62,45\n" +
+                                "2007-01-08,66,48\n" +
+                                "2007-01-09,63,39\n" +
+                                "2007-01-10,57,37\n" +
+                                "2007-01-11,50,37\n" +
+                                "2007-01-12,48,35\n"
+                                , // path to CSV file
+                                {}          // options
+                        );
+                    </script>
+
+                </div>
+                <div class="col-lg-4 col-sm-4 col-xs-12" id="checkboxes">
+
+
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" aria-label="...">
+                        </span>
+                        <input type="text" class="form-control" aria-label="..."  placeholder="FIRST CHECK">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" aria-label="...">
+                        </span>
+                        <input type="text" class="form-control" aria-label="..."  placeholder="Second Check">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" aria-label="...">
+                        </span>
+                        <input type="text" class="form-control" aria-label="..."  placeholder="Third Check">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" aria-label="...">
+                        </span>
+                        <input type="text" class="form-control" aria-label="..."  placeholder="Forth Check">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" aria-label="...">
+                        </span>
+                        <input type="text" class="form-control" aria-label="..."  placeholder="Fifth Check">
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+        <hr>
+
+        <header class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Finishing</a>
+
+                </div>
+            </div>
+        </header>
+
+
+
+    </body>
+</html>
